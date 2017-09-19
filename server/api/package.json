@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Lambda functions to support public-bikes API",
   "main": "stations.js",
-  "author": "jkahn@",
+  "author": "danrongm@",
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.9.0",

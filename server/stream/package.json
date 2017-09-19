@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Lambda function to support public-bikes DynamoDB Stream",
   "main": "index.js",
-  "author": "jkahn@",
+  "author": "danrongm@",
   "license": "ISC",
   "dependencies": {
     "redis": "^2.6.5"
