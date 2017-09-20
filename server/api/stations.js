@@ -1,34 +1,8 @@
-/**
-
- Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
- Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
- except in compliance with the License. A copy of the License is located at
-
-    http://aws.amazon.com/apache2.0/
-
- or in the "license" file accompanying this file. This file is distributed on an "AS IS"
- BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- License for the specific language governing permissions and limitations under the License.
-
- */
-
 'use strict'
-
-/**
-
- Backend API for elasticache-geospatial-public-bikes sample application.
-
- date: Jan 2017
-
- */
-
-//----
 const listSearchRadius      = process.env.SEARCH_RADIUS
 const listSearchRadiusUnits = process.env.SEARCH_RADIUS_UNITS
 const listResultCount       = process.env.RESULT_COUNT
 
-//---- Shared Functions ----
 const buildResponse = (statusCode, body) => {
 
   return {
@@ -41,16 +15,6 @@ const buildResponse = (statusCode, body) => {
 
 };
 
-
-/**
-
- Retrieves all stations within specified distance of the passed coordinates.
-
- Sample request query string:
-
-  latitude=41.8802596&longitude=-87.6346818
-
- */
 module.exports.list = (event, context, callback) => {
   var coords  = event.queryStringParameters;
 
@@ -97,13 +61,9 @@ module.exports.list = (event, context, callback) => {
 };
 
 /**
-
  Retrieves listing of stations from public data sources and stores in
  DynamoDB.  A DynamoDB stream will populate the cache.
-
  */
-
-//----
 const getStationData = (url) => new Promise( (resolve, reject) => {
   const https   = require('https');
   const request = https.get(url, (response) => {
@@ -128,22 +88,13 @@ const getStationData = (url) => new Promise( (resolve, reject) => {
 
 });
 
-//----
 const storeStationData = (data) => {
-  //----
   const AWS   = require('aws-sdk');
-
-  //----
   const ddb = new AWS.DynamoDB.DocumentClient();
   const tableName = process.env.TABLE_NAME;
-
   var params = { RequestItems: {} }
   params.RequestItems[tableName] = [];
-
-  // we will only load the first 25 stations here, else
-  // run into max size of single DDB batchWrite operation
   var maxIndex = Math.min(25, data.stationBeanList.length);
-
   for (var i = 0; i < maxIndex; i++) {
     var station = data.stationBeanList[i];
     var item = {
@@ -165,10 +116,8 @@ const storeStationData = (data) => {
   return ddb.batchWrite(params).promise();
 };
 
-
 module.exports.setup = (event, context, callback) => {
   const dataUrl = process.env.DATA_URL
-
   getStationData(dataUrl)
     .then( (data) => {
       return storeStationData(data);
@@ -182,6 +131,3 @@ module.exports.setup = (event, context, callback) => {
       callback(error);
     });
 };
-
-
-
